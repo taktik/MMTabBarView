@@ -13,15 +13,15 @@
 #import "NSView+MMTabBarViewExtensions.h"
 #import "NSBezierPath+MMTabBarViewExtensions.h"
 
-@interface MMYosemiteTabStyle (/*Private*/)
+@interface MMYosemiteTabStyle (SharedPrivates)
 
 - (void)_drawCardBezelInRect:(NSRect)aRect withCapMask:(MMBezierShapeCapMask)capMask usingStatesOfAttachedButton:(MMAttachedTabBarButton *)button ofTabBarView:(MMTabBarView *)tabBarView;
 - (void)_drawBoxBezelInRect:(NSRect)aRect withCapMask:(MMBezierShapeCapMask)capMask usingStatesOfAttachedButton:(MMAttachedTabBarButton *)button ofTabBarView:(MMTabBarView *)tabBarView;
-
+- (NSRect)_addTabButtonRect;
+- (NSRect)_overflowButtonRect;
 @end
 
 @implementation MMYosemiteTabStyle
-
 @synthesize leftMarginForTabBarView = _leftMargin;
 
 + (NSString *)name {
@@ -37,16 +37,19 @@
 
 - (id) init {
 	if ((self = [super init])) {
-		YosemiteCloseButton = [[NSImage alloc] initByReferencingFile:[[MMTabBarView bundle] pathForImageResource:@"AquaTabClose_Front"]];
-		YosemiteCloseButtonDown = [[NSImage alloc] initByReferencingFile:[[MMTabBarView bundle] pathForImageResource:@"AquaTabClose_Front_Pressed"]];
-		YosemiteCloseButtonOver = [[NSImage alloc] initByReferencingFile:[[MMTabBarView bundle] pathForImageResource:@"AquaTabClose_Front_Rollover"]];
+		YosemiteCloseButton = [[NSImage alloc] initByReferencingFile:[[MMTabBarView bundle] pathForImageResource:@"YosemiteTabClose_Front"]];
+		YosemiteCloseButtonDown = [[NSImage alloc] initByReferencingFile:[[MMTabBarView bundle] pathForImageResource:@"YosemiteTabClose_Front_Pressed"]];
+		YosemiteCloseButtonOver = [[NSImage alloc] initByReferencingFile:[[MMTabBarView bundle] pathForImageResource:@"YosemiteTabClose_Front_Rollover"]];
 
 		YosemiteCloseDirtyButton = [[NSImage alloc] initByReferencingFile:[[MMTabBarView bundle] pathForImageResource:@"AquaTabCloseDirty_Front"]];
 		YosemiteCloseDirtyButtonDown = [[NSImage alloc] initByReferencingFile:[[MMTabBarView bundle] pathForImageResource:@"AquaTabCloseDirty_Front_Pressed"]];
 		YosemiteCloseDirtyButtonOver = [[NSImage alloc] initByReferencingFile:[[MMTabBarView bundle] pathForImageResource:@"AquaTabCloseDirty_Front_Rollover"]];
 
+        TabNewYosemite = [[NSImage alloc] initByReferencingFile:[[MMTabBarView bundle] pathForImageResource:@"YosemiteTabNew"]];
+
 		_leftMargin = -1.0f;
 	}
+    
 	return self;
 }
 
@@ -57,7 +60,7 @@
 	[YosemiteCloseDirtyButton release], YosemiteCloseDirtyButton = nil;
 	[YosemiteCloseDirtyButtonDown release], YosemiteCloseDirtyButtonDown = nil;
 	[YosemiteCloseDirtyButtonOver release], YosemiteCloseDirtyButtonOver = nil;
-
+    [TabNewYosemite release], TabNewYosemite = nil;
 	[super dealloc];
 }
 
@@ -85,6 +88,42 @@
     return 0.0f;
 }
 
+- (CGFloat)heightOfTabBarButtonsForTabBarView:(MMTabBarView *)tabBarView {
+    return 25;
+}
+
+
+- (NSRect)addTabButtonRectForTabBarView:(MMTabBarView *)tabBarView {
+    NSRect window = [tabBarView frame];
+    NSSize buttonSize = [tabBarView addTabButtonSize];
+    NSRect rect = NSMakeRect(NSMaxX(window) - buttonSize.width - 5, 1, buttonSize.width, buttonSize.height);
+    return rect;
+}
+
+- (NSSize)addTabButtonSizeForTabBarView:(MMTabBarView *)tabBarView {
+    return NSMakeSize(18,[tabBarView frame].size.height);
+}
+
+
+//
+//
+//- (NSRect)overflowButtonRectForTabBarView:(MMTabBarView *)tabBarView {
+//    [tabBarView update];
+//    NSRect window = [tabBarView frame];
+//    NSSize buttonSize = [tabBarView addTabButtonSize];
+//    NSRect rect = NSMakeRect(NSMaxX(window) - buttonSize.width - 5, 2, buttonSize.width, buttonSize.height);
+//    return NSZeroRect;
+//}
+
+
+//- (NSRect)overflowButtonRectForTabBarView:(MMTabBarView *)tabBarView {
+//    NSRect rect = [tabBarView _overflowButtonRect];
+//    
+//    //rect.origin.y += [tabBarView topMargin];
+//    //rect.size.width = 60;
+//    return rect;
+//}
+
 - (BOOL)supportsOrientation:(MMTabBarOrientation)orientation forTabBarView:(MMTabBarView *)tabBarView {
 
     if (orientation != MMTabBarHorizontalOrientation)
@@ -102,6 +141,16 @@
 	dragRect.size.width++;
 	return dragRect;
     
+}
+
+#pragma mark -
+#pragma mark Add Tab Button
+
+- (void)updateAddButton:(MMRolloverButton *)aButton ofTabBarView:(MMTabBarView *)tabBarView {
+    
+    [aButton setImage:TabNewYosemite];
+    [aButton setAlternateImage:TabNewYosemite];
+    [aButton setRolloverImage:TabNewYosemite];
 }
 
 #pragma mark -
@@ -123,6 +172,7 @@
             return YosemiteCloseDirtyButtonOver;
         case MMCloseButtonImageTypeDirtyPressed:
             return YosemiteCloseDirtyButtonDown;
+        
             
         default:
             break;
@@ -136,16 +186,15 @@
 - (void)drawBezelOfTabBarView:(MMTabBarView *)tabBarView inRect:(NSRect)rect {
 	//Draw for our whole bounds; it'll be automatically clipped to fit the appropriate drawing area
 	rect = [tabBarView bounds];
+    tabBarView.resizeTabsToFitTotalWidth= YES;
 
 	NSRect gradientRect = rect;
-    
-    NSWindow *window = [tabBarView window];
 
 	if (![tabBarView isWindowActive]) {
 		[[NSColor windowBackgroundColor] set];
-		//NSRectFill(gradientRect);
 	} else {
-        NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:0.835 alpha:1.0] endingColor:[NSColor colorWithCalibratedWhite:0.843 alpha:1.0]];
+        NSColor *startColor = [NSColor colorWithDeviceWhite:0.8 alpha:1.000];
+        NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:startColor endingColor:startColor];
         [gradient drawInRect:gradientRect angle:90.0];
         [gradient release];
     }
@@ -153,6 +202,7 @@
     [[NSColor colorWithCalibratedWhite:0.576 alpha:1.0] set];
     [NSBezierPath strokeLineFromPoint:NSMakePoint(NSMinX(rect), NSMinY(rect) + 0.5)
                               toPoint:NSMakePoint(NSMaxX(rect), NSMinY(rect) + 0.5)];
+    
     [NSBezierPath strokeLineFromPoint:NSMakePoint(NSMinX(rect), NSMaxY(rect) - 0.5)
                               toPoint:NSMakePoint(NSMaxX(rect), NSMaxY(rect) - 0.5)];
 }
@@ -315,31 +365,25 @@
     NSColor *lineColor = [NSColor colorWithCalibratedWhite:0.576 alpha:1.0];
     CGFloat radius = 0.0f;
 
-    capMask &= ~MMBezierShapeFillPath;
+    //capMask &= ~MMBezierShapeFillPath;
         
     NSBezierPath *fillPath = [NSBezierPath bezierPathWithCardInRect:aRect radius:radius capMask:capMask|MMBezierShapeFillPath];
 
     if ([tabBarView isWindowActive]) {
         if ([button state] == NSOnState) {
-            NSColor *startColor = [NSColor colorWithDeviceWhite:0.88 alpha:1.000];
-            NSColor *endColor = [NSColor colorWithDeviceWhite:0.88 alpha:1.000];
+            NSColor *startColor = [NSColor colorWithDeviceWhite:0.875 alpha:1.000];
+            NSColor *endColor = [NSColor colorWithDeviceWhite:0.902 alpha:1.000];
             NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:startColor endingColor:endColor];
-            [gradient drawInBezierPath:fillPath angle:80.0];
-            [gradient release];
-        } else if ([button mouseHovered]) {
-            NSColor *startColor = [NSColor colorWithDeviceWhite:0.8 alpha:1.000];
-            NSColor *endColor = [NSColor colorWithDeviceWhite:0.8 alpha:1.000];
-            NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:startColor endingColor:endColor];
-            [gradient drawInBezierPath:fillPath angle:80.0];
+            [[NSGraphicsContext currentContext] setShouldAntialias:NO];
+            [gradient drawInBezierPath:fillPath angle:90.0];
+            [[NSGraphicsContext currentContext] setShouldAntialias:YES];
             [gradient release];
         } else {
             NSColor *startColor = [NSColor colorWithDeviceWhite:0.8 alpha:1.000];
-            NSColor *endColor = [NSColor colorWithDeviceWhite:0.8 alpha:1.000];
-            NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:startColor endingColor:endColor];
+            NSGradient *gradient = [[NSGradient alloc] initWithStartingColor:startColor endingColor:startColor];
             [gradient drawInBezierPath:fillPath angle:80.0];
             [gradient release];
         }
-        
     } else {
         
         if ([button state] == NSOnState) {
