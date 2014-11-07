@@ -21,6 +21,7 @@
 #import "MMLiveChatTabStyle.h"
 #import "MMCardTabStyle.h"
 #import "MMSafariTabStyle.h"
+#import "MMYosemiteTabStyle.h"
 #import "MMTabDragAssistant.h"
 #import "MMTabBarController.h"
 #import "MMAttachedTabBarButton.h"
@@ -343,7 +344,8 @@ static NSMutableDictionary *registeredStyleClasses = nil;
 #pragma mark Style Class Registry
 
 + (void)registerDefaultTabStyleClasses {
-
+    
+    [self registerTabStyleClass:[MMYosemiteTabStyle class]];
     [self registerTabStyleClass:[MMAquaTabStyle class]];
     [self registerTabStyleClass:[MMUnifiedTabStyle class]];
     [self registerTabStyleClass:[MMAdiumTabStyle class]];
@@ -1194,39 +1196,39 @@ static NSMutableDictionary *registeredStyleClasses = nil;
 
 		if (_partnerView) {
                 // above or below me?
-			if ((myOriginalOrigin - kMMTabBarViewHeight) > partnerOriginalOrigin) {
+			if ((myOriginalOrigin - [self heightOfTabBarButtons]) > partnerOriginalOrigin) {
                     // partner is below me
 				if (_isHidden) {
                         // I'm shrinking
 					partnerTargetOrigin = partnerOriginalOrigin;
-					partnerTargetSize = partnerOriginalSize + kMMTabBarViewHeight;
+					partnerTargetSize = partnerOriginalSize + [self heightOfTabBarButtons];
 				} else {
                         // I'm growing
 					partnerTargetOrigin = partnerOriginalOrigin;
-					partnerTargetSize = partnerOriginalSize - kMMTabBarViewHeight;
+					partnerTargetSize = partnerOriginalSize - [self heightOfTabBarButtons];
 				}
 			} else {
                     // partner is above me
 				if (_isHidden) {
                         // I'm shrinking
-					partnerTargetOrigin = partnerOriginalOrigin - kMMTabBarViewHeight;
-					partnerTargetSize = partnerOriginalSize + kMMTabBarViewHeight;
+					partnerTargetOrigin = partnerOriginalOrigin - [self heightOfTabBarButtons];
+					partnerTargetSize = partnerOriginalSize + [self heightOfTabBarButtons];
 				} else {
                         // I'm growing
-					partnerTargetOrigin = partnerOriginalOrigin + kMMTabBarViewHeight;
-					partnerTargetSize = partnerOriginalSize - kMMTabBarViewHeight;
+					partnerTargetOrigin = partnerOriginalOrigin + [self heightOfTabBarButtons];
+					partnerTargetSize = partnerOriginalSize - [self heightOfTabBarButtons];
 				}
 			}
 		} else {
                 // for window movement
 			if (_isHidden) {
                     // I'm shrinking
-				partnerTargetOrigin = partnerOriginalOrigin + kMMTabBarViewHeight;
-				partnerTargetSize = partnerOriginalSize - kMMTabBarViewHeight;
+				partnerTargetOrigin = partnerOriginalOrigin + [self heightOfTabBarButtons];
+				partnerTargetSize = partnerOriginalSize - [self heightOfTabBarButtons];
 			} else {
                     // I'm growing
-				partnerTargetOrigin = partnerOriginalOrigin - kMMTabBarViewHeight;
-				partnerTargetSize = partnerOriginalSize + kMMTabBarViewHeight;
+				partnerTargetOrigin = partnerOriginalOrigin - [self heightOfTabBarButtons];
+				partnerTargetSize = partnerOriginalSize + [self heightOfTabBarButtons];
 			}
 		}
 	} else {   // vertical 
