@@ -8,6 +8,17 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface TKDropDownButtonCell : NSSegmentedCell
+@interface TKDropDownButtonCell : NSSegmentedCell {
+    BOOL simulateClickOnMouseHovered;
+    BOOL mouseHovered;
+    NSImage * alternateImage;
+    NSImage * rolloverImage;
+}
 
+@property (assign, readwrite) BOOL simulateClickOnMouseHovered;
+@property (assign, readwrite) BOOL mouseHovered;
+@property (strong, readwrite) NSImage * alternateImage;
+@property (strong, readwrite) NSImage * rolloverImage;
+
+- (void)addTrackingAreasForView:(NSView *)controlView inRect:(NSRect)cellFrame withUserInfo:(NSDictionary *)userInfo mouseLocation:(NSPoint)mouseLocation;
 @end

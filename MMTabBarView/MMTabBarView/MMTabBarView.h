@@ -45,6 +45,7 @@ static NSImage* _static##name##Image() \
 @class MMAttachedTabBarButton;
 @class MMSlideButtonsAnimation;
 @class MMTabBarController;
+@class TKDropDownButton;
 
 @protocol MMTabStyle;
 
@@ -72,7 +73,7 @@ typedef enum MMAttachedButtonsEnumerationOptions : NSUInteger {
     // control basics
     NSTabView                       *_tabView;                    // the tab view being navigated
     MMOverflowPopUpButton           *_overflowPopUpButton;        // for too many tabs
-    MMRolloverButton                *_addTabButton;
+    TKDropDownButton                *_addTabButton;
     MMTabBarController              *_controller;
 
     // Spring-loading.
@@ -355,8 +356,9 @@ typedef enum MMAttachedButtonsEnumerationOptions : NSUInteger {
 
     // Contextual menu support
 - (NSMenu *)tabView:(NSTabView *)aTabView menuForTabViewItem:(NSTabViewItem *)tabViewItem;
+- (NSMenu *)tabView:(NSTabView *)aTabView menuForAddTabButton:(NSTabViewItem *)tabViewItem;
 
-    // Drag and drop related methods
+// Drag and drop related methods
 - (BOOL)tabView:(NSTabView *)aTabView shouldDragTabViewItem:(NSTabViewItem *)tabViewItem inTabBarView:(MMTabBarView *)tabBarView;
 - (NSDragOperation)tabView:(NSTabView *)aTabView validateDrop:(id <NSDraggingInfo>)sender proposedItem:(NSTabViewItem *)tabViewItem proposedIndex:(NSUInteger)proposedIndex inTabBarView:(MMTabBarView *)tabBarView;
 - (NSDragOperation)tabView:(NSTabView *)aTabView validateSlideOfProposedItem:(NSTabViewItem *)tabViewItem proposedIndex:(NSUInteger)proposedIndex inTabBarView:(MMTabBarView *)tabBarView;

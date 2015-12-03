@@ -30,6 +30,8 @@
 #import "NSView+MMTabBarViewExtensions.h"
 #import "MMTabBarItem.h"
 
+#import "TKDropDownButton.h"
+
 #define DIVIDER_WIDTH 3
 
 @interface MMTabBarView (/*Private*/)
@@ -1989,7 +1991,6 @@ static NSMutableDictionary *registeredStyleClasses = nil;
 }
 
 - (void)tabViewDidChangeNumberOfTabViewItems:(NSTabView *)aTabView {
-
     if (_tabView != aTabView)
         return;
         
@@ -2752,7 +2753,7 @@ StaticImage(AquaTabNewRollover)
     }
         // new tab button
 	NSRect addTabButtonRect = [self addTabButtonRect];
-	_addTabButton = [[MMRolloverButton alloc] initWithFrame:addTabButtonRect];
+	_addTabButton = [[TKDropDownButton alloc] initWithFrame:addTabButtonRect];
     
     [_addTabButton setImage:_staticAquaTabNewImage()];
     [_addTabButton setAlternateImage:_staticAquaTabNewPressedImage()];
@@ -2760,12 +2761,15 @@ StaticImage(AquaTabNewRollover)
     
     [_addTabButton setTitle:@""];
     [_addTabButton setImagePosition:NSImageOnly];
-    [_addTabButton setRolloverButtonType:MMRolloverActionButton];
     [_addTabButton setBordered:NO];
     [_addTabButton setBezelStyle:NSShadowlessSquareBezelStyle];
     
-    if (_style && [_style respondsToSelector:@selector(updateAddButton:ofTabBarView:)])
-        [_style updateAddButton:_addTabButton ofTabBarView:self];
+    if ([[self delegate] respondsToSelector:@selector(tabView:menuForAddTabButton:)]) {
+        [_addTabButton setMenu:[self.delegate tabView:self.tabView menuForAddTabButton:_addTabButton]];
+    }
+    
+    //if (_style && [_style respondsToSelector:@selector(updateAddButton:ofTabBarView:)])
+    //    [_style updateAddButton:_addTabButton ofTabBarView:self];
 
     [_addTabButton setTarget:self];
     [_addTabButton setAction:@selector(_addNewTab:)];
@@ -2777,6 +2781,8 @@ StaticImage(AquaTabNewRollover)
     } else {
         [_addTabButton setHidden:YES];
     }
+    
+    
 }
 
 - (void)_updateOverflowPopUpButton {
