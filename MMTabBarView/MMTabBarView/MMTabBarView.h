@@ -98,7 +98,7 @@ typedef enum MMAttachedButtonsEnumerationOptions : NSUInteger {
     BOOL                            _allowsBackgroundTabClosing;
     BOOL                            _selectsTabsOnMouseDown;
     BOOL                            _resizeTabsToFitTotalWidth;
-
+    NSString                       *_statusText;
     // vertical tab resizing
     BOOL                            _allowsResizing;
     BOOL                            _isResizing;
@@ -135,6 +135,7 @@ typedef enum MMAttachedButtonsEnumerationOptions : NSUInteger {
 @property (readonly) BOOL isResizing;
 @property (assign) BOOL needsUpdate;
 @property (assign) BOOL resizeTabsToFitTotalWidth;
+@property (retain, nonatomic) NSString * statusText;
 
 #pragma mark Control Characteristics
 
@@ -350,6 +351,7 @@ typedef enum MMAttachedButtonsEnumerationOptions : NSUInteger {
 
     // Closing behavior
 - (BOOL)tabView:(NSTabView *)aTabView disableTabCloseForTabViewItem:(NSTabViewItem *)tabViewItem;
+- (double)tabView:(NSTabView *)aTabView optimalWidthForTabViewItem:(NSTabViewItem *)tabViewItem;
 
     // Adding tabs
 - (void)addNewTabToTabView:(NSTabView *)aTabView;

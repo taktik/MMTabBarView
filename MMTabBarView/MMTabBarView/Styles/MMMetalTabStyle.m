@@ -70,14 +70,14 @@ StaticImage(TabNewMetalRollover)
 
 - (CGFloat)leftMarginForTabBarView:(MMTabBarView *)tabBarView {
     if ([tabBarView orientation] == MMTabBarHorizontalOrientation)
-        return 10.0f;
+        return 0.0f;
     else
         return 0.0f;
 }
 
 - (CGFloat)rightMarginForTabBarView:(MMTabBarView *)tabBarView {
     if ([tabBarView orientation] == MMTabBarHorizontalOrientation)
-        return 10.0f;
+        return 0.0f;
     else
         return 0.0f;
 }
@@ -86,7 +86,7 @@ StaticImage(TabNewMetalRollover)
     if ([tabBarView orientation] == MMTabBarHorizontalOrientation)
         return 0.0f;
     else
-        return 10.0f;
+        return 0.0f;
 }
 
 #pragma mark -

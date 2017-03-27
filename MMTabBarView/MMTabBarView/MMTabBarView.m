@@ -95,6 +95,7 @@
 
 @implementation MMTabBarView
 
+@synthesize statusText = _statusText;
 @dynamic tabView;
 @synthesize partnerView = _partnerView;
 @dynamic delegate;
@@ -846,6 +847,12 @@ static NSMutableDictionary *registeredStyleClasses = nil;
 
 #pragma mark -
 #pragma mark Control Configuration
+
+- (void) setStatusText:(NSString *)statusText {
+    _statusText = statusText;
+    
+    [self setNeedsDisplay:YES];
+}
 
 - (id <MMTabStyle>)style {
 	return _style;
@@ -1841,11 +1848,14 @@ static NSMutableDictionary *registeredStyleClasses = nil;
 }
 
 - (void)drawRect:(NSRect)rect {
-
     if ([_style respondsToSelector:@selector(drawTabBarView:inRect:)]) {
         [_style drawTabBarView:self inRect:rect];
     } else {
         [self _drawTabBarViewInRect:rect];
+    }
+    if (self.statusText) {
+        NSAttributedString * as = [[NSAttributedString alloc] initWithString:self.statusText];
+        [as drawInRect:NSMakeRect(self.bounds.size.width - as.size.width - 10, 3.0, as.size.width + 10, 22.0)];
     }
 }
 

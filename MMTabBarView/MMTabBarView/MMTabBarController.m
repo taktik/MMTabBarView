@@ -170,7 +170,9 @@ static NSInteger potentialMinimumForArray(NSArray *array, NSInteger minimum){
             }
             else if (_tabBarView.resizeTabsToFitTotalWidth) {
                 width = _tabBarView.frame.size.width;
-			} else {
+            } else if ([[_tabBarView delegate] respondsToSelector:@selector(tabView:optimalWidthForTabViewItem:)]) {
+                width = [[_tabBarView delegate] tabView:[_tabBarView tabView] optimalWidthForTabViewItem:[currentButton tabViewItem]];
+            } else {
 				width = [_tabBarView buttonOptimumWidth];
 			}
 
