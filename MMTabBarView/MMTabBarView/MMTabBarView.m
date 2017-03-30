@@ -1516,17 +1516,15 @@ static NSMutableDictionary *registeredStyleClasses = nil;
 }
 
 - (void)update {
-
-    if (!_needsUpdate) {
-        return;
-    }
+    if (!_needsUpdate) { return; }
 
     _needsUpdate = NO;
 
-    if (![[self window] isVisible] || [self isHidden])
+    if (![[self window] isVisible] || [self isHidden]) {
         [self update:NO];
-    else
+    } else {
         [self update:_automaticallyAnimates];
+    }
 }
 
 - (void)update:(BOOL)animate {
